@@ -125,6 +125,7 @@ def log_action(action, details=""):
         AuditLog(
             user_id=user_id,
             action=action,
+            
             details=details[:500],
         )
     )
@@ -252,7 +253,7 @@ def register():
     return render_template("register.html")
 
 
-# Login
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -262,6 +263,16 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password_hash, password):
+            # Promote only the email configured by the server
+            admin_email = os.environ.get(
+                "ADMIN_EMAIL", ""
+            ).strip().lower()
+
+            if admin_email and user.email.lower() == admin_email:
+                if user.role != "admin":
+                    user.role = "admin"
+                    db.session.commit()
+
             session.clear()
             session["user_id"] = user.id
 
@@ -283,7 +294,7 @@ def logout():
     return redirect(url_for("login"))
 
 
-# User dashboard
+# User dashboard@app.route("/login"
 @app.route("/dashboard")
 @login_required
 def dashboard():
