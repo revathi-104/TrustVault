@@ -1,0 +1,106 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>TrustVault Admin Dashboard</h1>
+    <p>Manage users, documents, and security activity.</p>
+
+    <section class="dashboard-section">
+        <h2>Registered Users</h2>
+
+        {% if users %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.company or 'N/A' }}</td>
+                        <td>{{ user.role }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No users found.</p>
+        {% endif %}
+    </section>
+
+    <section class="dashboard-section">
+        <h2>Uploaded Documents</h2>
+
+        {% if documents %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Document</th>
+                        <th>Owner</th>
+                        <th>Company</th>
+                        <th>SHA-256 Hash</th>
+                        <th>Uploaded At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for document in documents %}
+                    <tr>
+                        <td>{{ document.filename }}</td>
+                        <td>{{ document.owner.name }}</td>
+                        <td>{{ document.company or 'N/A' }}</td>
+                        <td class="hash-cell">{{ document.sha256_hash }}</td>
+                        <td>{{ document.uploaded_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No documents found.</p>
+        {% endif %}
+    </section>
+
+    <section class="dashboard-section">
+        <h2>Audit Logs</h2>
+
+        {% if logs %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                        <th>Date &amp; Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.user.email if log.user else 'System' }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.details }}</td>
+                        <td>{{ log.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No audit logs found.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

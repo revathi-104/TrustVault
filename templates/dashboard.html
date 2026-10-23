@@ -1,0 +1,97 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | TrustVault{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <section class="dashboard-heading">
+        <div>
+            <h1>TrustVault Workspace</h1>
+            <p>Secure document sharing and integrity checks</p>
+        </div>
+        <form method="POST" action="{{ url_for('logout') }}">
+            <button class="logout-button" type="submit">Log Out</button>
+        </form>
+    </section>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="welcome-card">
+        <div class="brand-icon">🔐</div>
+        <h2>Hello, {{ user.name }}!</h2>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Company:</strong> {{ user.company }}</p>
+        <p><strong>Role:</strong> {{ user.role|title }}</p>
+    </section>
+
+    <section class="upload-panel">
+        <h2>Upload a Document</h2>
+        <p>Allowed: PDF, TXT, DOC, DOCX, PNG, JPG, CSV, XLSX. Maximum 10 MB.</p>
+        <form method="POST" action="{{ url_for('upload_document') }}"
+              enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="document" required>
+            <button type="submit" class="primary-button">Upload Document</button>
+        </form>
+    </section>
+
+    <h2 class="section-title">My Documents</h2>
+    <section class="document-list">
+        {% for doc in documents %}
+            <article class="document-row">
+                <div>
+                    <h3>📄 {{ doc.filename }}</h3>
+                    <p>Uploaded: {{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p class="hash-text">SHA-256: {{ doc.sha256_hash }}</p>
+                    <a href="{{ url_for('download_document', document_id=doc.id) }}">Download</a>
+                    <span> · </span>
+                    <a href="{{ url_for('verify_document', document_id=doc.id) }}">Verify integrity</a>
+                </div>
+
+                <form method="POST"
+                      action="{{ url_for('share_document', document_id=doc.id) }}"
+                      class="share-form">
+                    <label for="recipient-{{ doc.id }}">Share with company user</label>
+                    <input id="recipient-{{ doc.id }}" type="email" name="email"
+                           placeholder="recipient@company.com" required>
+                    <button type="submit" class="secondary-button">Share</button>
+                </form>
+            </article>
+        {% else %}
+            <p class="empty-state">No documents uploaded yet. Upload your first file above.</p>
+        {% endfor %}
+    </section>
+
+    <h2 class="section-title">Shared With Me</h2>
+    <section class="document-list">
+        {% for share in shared_rows %}
+            <article class="document-row">
+                <div>
+                    <h3>🔗 {{ share.document.filename }}</h3>
+                    <p>Owner: {{ share.document.owner.name }}</p>
+                    <a href="{{ url_for('download_document', document_id=share.document.id) }}">Download</a>
+                    <span> · </span>
+                    <a href="{{ url_for('verify_document', document_id=share.document.id) }}">Verify integrity</a>
+                </div>
+            </article>
+        {% else %}
+            <p class="empty-state">No documents have been shared with you yet.</p>
+        {% endfor %}
+    </section>
+
+    {% if user.role == "admin" %}
+        <section class="admin-notice">
+            <h2>Administrator Tools</h2>
+            <p>Review users and audit activity.</p>
+            <a class="primary-link" href="{{ url_for('admin') }}">Open Admin Dashboard</a>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}
