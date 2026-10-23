@@ -567,8 +567,25 @@ def too_large(_error):
 
 
 # Create database tables
+    
+# Create database tables and configure the designated admin
 with app.app_context():
     db.create_all()
+
+    admin_email = os.environ.get("ADMIN_EMAIL", "").strip().lower()
+
+    if admin_email:
+        admin_user = User.query.filter_by(email=admin_email).first()
+
+        if admin_user:
+            admin_user.role = "admin"
+            db.session.commit()
+            app.logger.info("Configured designated admin account.")
+        else:
+            app.logger.warning(
+                "ADMIN_EMAIL account not found; no role was changed."
+            )
+
 
 
 if __name__ == "__main__":
