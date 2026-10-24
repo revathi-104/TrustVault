@@ -135,7 +135,6 @@ This document identifies potential security threats to TrustVault, a Flask-based
 **Test plan:** Review the deployment configuration and confirm that secrets are not exposed in source code or responses.
 
 **Result:** Pending verification.
-
 ## 4. Known Limitations
 
 - TrustVault is a demonstration project and has not undergone an independent security audit.
@@ -150,7 +149,7 @@ Record each test only after performing it. Include the test date, account role u
 | Test | Status |
 |---|---|
 | Unauthorized document download | Pending |
-| Regular user accessing admin route | Pending |
+| Regular user accessing admin route | Pass |
 | Unsupported and oversized uploads | Pending |
 | Unauthorized sharing | Pending |
 | Download after share revocation | Pending |
